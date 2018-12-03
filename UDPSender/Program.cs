@@ -1,21 +1,30 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace UDPSender
 {
     class Program
     {
-        static void Main(string[] args)
+        public const int Port = 7000;
+        static void Main()
         {
-            // The code provided will print ‘Hello World’ to the console.
-            // Press Ctrl+F5 (or go to Debug > Start Without Debugging) to run your app.
-            Console.WriteLine("Hello World!");
-            Console.ReadKey();
-
-            // Go to http://aka.ms/dotnet-get-started-console to continue learning how to build a console app! 
+            UdpClient socket = new UdpClient();
+            socket.EnableBroadcast = true; // IMPORTANT
+            IPEndPoint endPoint = new IPEndPoint(IPAddress.Broadcast, Port);
+            while (true)
+            {
+                string message = "The time is 12:50 " + DateTime.Now;
+                byte[] sendBuffer = Encoding.ASCII.GetBytes(message);
+                socket.Send(sendBuffer, sendBuffer.Length, endPoint);
+                Console.WriteLine("Message sent to broadcast address {0} port {1}", endPoint.Address, Port);
+                Thread.Sleep(5000);
+            }
         }
     }
 }
